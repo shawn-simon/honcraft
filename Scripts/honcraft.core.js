@@ -1,11 +1,18 @@
-﻿var honcraft = (function () {
+var honcraft = (function () {
     var hc =
     {
         getDps: function (hero, targets) {
+            if (!$.isArray(targets)) {
+                targets = [targets];
+            }
             var result = {};
             result.baseDamage = hero.getBaseDamage();
             result.attacksPerSecond = hero.getAttacksPerSecond();
-            var physicalDps = result.baseDamage * result.attacksPerSecond;
+            result.damageFromItems = 0;
+            $.each(hero.items, function(i, item) {
+                result.damageFromItems += parseInt(item.attributes.DAMAGE, 10)
+            });
+            var physicalDps = (result.baseDamage + result.damageFromItems) * result.attacksPerSecond;
             var magicDps = 0;
 
             result.byTarget = [];
@@ -56,31 +63,32 @@
                         TURNRATE: 0,
                         MAXHEALTH: 0,
                         HEALTHREGEN: 0,
-                        maxmana: 0,
-                        manaregen: 0,
-                        armor: 0,
-                        magicarmor: 0,
-                        attackduration: 1000,
-                        attackactiontime: 500,
-                        attackcooldown: 1700,
-                        attackdamagemin: 0,
-                        attackdamagemax: 0,
-                        attackrange: 0,
-                        attacktype: 'melee',
-                        primaryattribute: 'Strength',
-                        strength: 0,
-                        strengthperlevel: 0,
-                        agility: 0,
-                        agilityperlevel: 0,
-                        intelligence: 0,
-                        intelligenceperlevel: 0
+                        MAXMANA: 0,
+                        MANAREGEN: 0,
+                        ARMOR: 0,
+                        MAGICARMOR: 0,
+                        ATTACKDURATION: 1000,
+                        ATTACKACTIONTIME: 500,
+                        ATTACKCOOLDOWN: 1700,
+                        ATTACKDAMAGEMIN: 0,
+                        ATTACKDAMAGEMAX: 0,
+                        ATTACKRANGE: 0,
+                        ATTACKTYPE: 'melee',
+                        PRIMARYATTRIBUTE: 'Strength',
+                        STRENGTH: 0,
+                        STRENGTHPERLEVEL: 0,
+                        AGILITY: 0,
+                        AGILITYPERLEVEL: 0,
+                        INTELLIGENCE: 0,
+                        INTELLIGENCEPERLEVEL: 0
                     },
                     attr: function (name) {
-                        var attribute = hero.attributes[name.toUpperCase()];
-                        if (attribute == null) {
-                            return hero.attributes[name.toLowerCase()];
-                        }
-                        return attribute;
+                        var attribute = hero.attributes[name];
+                        if (attribute == null)    
+                            attribute = hero.attributes[name.toLowerCase()];                        
+                        if (attribute == null) 
+                            attribute = hero.attributes[name.toUpperCase()];
+                       return attribute;
                     },
                     items: [],
                     level: 1,
@@ -89,7 +97,7 @@
                 hero.calculateAttribute = function (attrName) {
                     var attributeFromItems = 0;
                     $.each(hero.items, function (i, item) {
-                        attributeFromItems = attributeFromItems + parseInt(item.attr(attrName.toUpperCase()), 10);
+                        attributeFromItems = attributeFromItems + parseInt(item.attr(attrName), 10);
                     });
                     var attributeFromLeveling = parseInt(hero.attr(attrName.toUpperCase() + 'PERLEVEL'), 10) * (hero.level - 1);
                     var attributeBoosts = 2 * hero.attributeBoosts;
@@ -99,32 +107,32 @@
                 hero.getAttacksPerSecond = function () {
                     var iasFromItems = 0;
                     $.each(hero.items, function (i, item) {
-                        iasFromItems = iasFromItems + parseInt(item.attr('ATTACKSPEED'), 10);
+                        iasFromItems = iasFromItems + parseInt(item.attributes.ATTACKSPEED, 10);
                     });
                     iasFromItems = iasFromItems * 100;
                     var iasFromAgility = hero.calculateAttribute('AGILITY');
-                    var bat = parseInt(hero.attr('attackcooldown'), 10) / 1000;
+                    var bat = parseInt(hero.attributes.ATTACKCOOLDOWN, 10) / 1000;
                     return hc.getAttacksPerSecond(bat, iasFromAgility + iasFromItems);
                 };
                 hero.getBaseDamage = function () {
-                    return ((parseInt(hero.attr('ATTACKDAMAGEMIN'), 10) + parseInt(hero.attr('ATTACKDAMAGEMAX'), 10)) / 2) + hero.calculateAttribute(hero.attr('PRIMARYATTRIBUTE'));
+                    return ((parseInt(hero.attributes.ATTACKDAMAGEMIN, 10) + parseInt(hero.attributes.ATTACKDAMAGEMAX, 10)) / 2) + hero.calculateAttribute(hero.attributes.PRIMARYATTRIBUTE);
                 };
-                hero.calculateMaxDps = function () {
-                    var result = { byTarget: [{dps: 0}] };
-                    honcraft.math.getAllCombinations(honcraft.data.item.length, 2, function (a,b,c,d,e,f) {
-                        hero.items = [
-                            honcraft.item.create(honcraft.data.item[a]),
-                            honcraft.item.create(honcraft.data.item[b]),
-                            honcraft.item.create(honcraft.data.item[c]),
-                            honcraft.item.create(honcraft.data.item[d]),
-                            honcraft.item.create(honcraft.data.item[e]),
-                            honcraft.item.create(honcraft.data.item[f])
-                            ];
-                        var dpsResult = honcraft.getDps(hero);
-                        if (dpsResult.byTarget[0].dps > result.byTarget[0].dps) {
-                            result = dpsResult;
-                            result.items = $.extend(true, [], hero.items);
-                        }
+                hero.calculateMaxDps = function (targets, itemsAvailable) {
+                    itemsAvailable = itemsAvailable || honcraft.item.getAllItems().splice(0, 15);
+                    var result = [];                    
+                    $.each(targets || honcraft.sampleTargets, function(key, target)
+                    {
+                        var i = result.length;
+                        result.push({target: target, dps: 0});                        
+                        honcraft.math.getAllCombinations(itemsAvailable.length, 6, function (a, b, c, d, e, f) {
+                            hero.items = [itemsAvailable[a], itemsAvailable[b], itemsAvailable[c], itemsAvailable[d], itemsAvailable[e], itemsAvailable[f]];                        
+                            var dpsResult = honcraft.getDps(hero, target);
+                            if (dpsResult.byTarget[0].dps > result[i].dps) {
+                                result[i].dps = dpsResult.byTarget[0].dps;
+                                result[i].items = hero.items.slice(0);
+                                result[i].dpsResult = dpsResult;
+                            }
+                        });                        
                     });
                     return result;
                 };
@@ -147,21 +155,32 @@
             {
                 var item = $.extend(true, {
                     attributes: {
-                        strength: 0,
-                        attackspeed: 0,
-                        agility: 0,
-                        intelligence: 0                        
+                        STRENGTH: 0,
+                        ATTACKSPEED: 0,
+                        AGILITY: 0,
+                        INTELLIGENCE: 0,
+                        DAMAGE: 0                        
                     },
                     attr: function (name) {
-                        var attribute = item.attributes[name.toUpperCase()];
-                        if (attribute == null) {
-                            return item.attributes[name.toLowerCase()];
-                        }
-                        return attribute;
-                    }
+                        var attribute = item.attributes[name];
+                        if (attribute == null)    
+                            attribute = item.attributes[name.toLowerCase()];                        
+                        if (attribute == null) 
+                            attribute = item.attributes[name.toUpperCase()];
+                       return attribute;
+                    }        
                 }, baseItem);
                 return item;
             },
+            getAllItems: function()
+            {
+                var items = [];
+                $.each(honcraft.data.item, function(i, baseItem)
+                {
+                    items.push(honcraft.item.create(baseItem));
+                });
+                return items;
+            },            
             getItemById: function (id) {
                 var result;
                 $.each(honcraft.data.item, function (i, item) {
@@ -195,10 +214,9 @@
     hc.sampleTargets =
     {
         pureDamage: hc.hero.create({ name: "Pure Damage", attributes: { ARMOR: 0, MAGICARMOR: 0} }),
-        highArmor: hc.hero.create({ name: "High Armor", attributes: { armor: 30, magicArmor: 5.5} }),
-        shamansEquipped: hc.hero.create({ name: "Shamans", attributes: { armor: 10, magicArmor: 15.5} }),
-        midGame: hc.hero.create({ name: "Mid Game", attributes: { armor: 9, magicArmor: 5.5} })
+        highArmor: hc.hero.create({ name: "High Armor", attributes: { ARMOR: 30, MAGICARMOR: 5.5} }),
+        shamansEquipped: hc.hero.create({ name: "Shamans", attributes: { ARMOR: 10, MAGICARMOR: 15.5} }),
+        midGame: hc.hero.create({ name: "Mid Game", attributes: { ARMOR: 9, MAGICARMOR: 5.5} })
     };
     return hc;
 })();
-

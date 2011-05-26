@@ -8,7 +8,8 @@ $.extend(honcraft, (function () {
             {
                 targets = hc.sampleTargets.all();
             }
-            if (!$.isArray(incTargets)) {
+            else if (!$.isArray(incTargets)) 
+            {
                 targets.push(incTargets);
             }
             
@@ -24,9 +25,9 @@ $.extend(honcraft, (function () {
             
             $.each(hero.items, function(i, item) {
                 result.damageFromItems += item.damage;
-                if (item.CRITICALCHANCE != null)
+                if (item.criticalChance != null)
                 {
-                    critModifiers.push({criticalChance: item.criticalChance, criticalModifier: item.criticalModifer});
+                    critModifiers.push({criticalChance: item.criticalChance, criticalMultiplier: item.criticalMultiplier});
                 }
             });
             
@@ -43,9 +44,9 @@ $.extend(honcraft, (function () {
             result.criticalHitDpsMultiplier = critMultiplierResult.dpsMultiplier;
             
             // Get average damage per hit, including critical strike damage. 
-            var avgDamagePerHit = (result.baseDamage + result.damageFromItems);
+            result.avgDamagePerHit = (result.baseDamage + result.damageFromItems);
                                              
-            var physicalDps =  avgDamagePerHit * result.attacksPerSecond * critMultiplierResult.dpsMultiplier;
+            var physicalDps =  result.avgDamagePerHit * result.attacksPerSecond * critMultiplierResult.dpsMultiplier;
             var magicDps = 0;
 
             result.byTarget = [];
@@ -63,12 +64,12 @@ $.extend(honcraft, (function () {
         
         getCritMultiplier: function(critMultipliers)
         {            
-            critMultipliers.sort(function(a, b) {return b.CRITICALMODIFIER - a.CRITICALMODIFIER});
+            critMultipliers.sort(function(a, b) {return b.criticalMultiplier - a.criticalMultiplier});
             var dpsMultiplier = 1;                   
             var totalCriticalChance = 0;             
             $.each(critMultipliers, function (i, critMultiplier) {                
-                var diminishedChance = (1 - totalCriticalChance) * critMultiplier.CRITICALCHANCE;
-                dpsMultiplier = dpsMultiplier + (diminishedChance * (critMultiplier.CRITICALMODIFIER - 1));
+                var diminishedChance = (1 - totalCriticalChance) * critMultiplier.criticalChance;
+                dpsMultiplier = dpsMultiplier + (diminishedChance * (critMultiplier.criticalMultiplier - 1));
                 totalCriticalChance += diminishedChance; 
             });
                         
@@ -210,7 +211,7 @@ $.extend(honcraft, (function () {
                     intelligence: 0,
                     damage: 0,
                     criticalChance: 0,
-                    criticalModifier: 0                    
+                    criticalMultiplier: 0                    
                 };
                 if (baseItem != null)
                 {                
@@ -222,7 +223,7 @@ $.extend(honcraft, (function () {
                     item.attackSpeed = hc.util.parseNumberAttr(hc.util.getProperty(baseItem.attributes, 'attackSpeed'));
                     item.damage = hc.util.parseNumberAttr(hc.util.getProperty(baseItem.attributes, 'damage'));
                     item.criticalChance = hc.util.parseNumberAttr(hc.util.getProperty(baseItem.attributes, 'criticalChance'));
-                    item.criticalModifier = hc.util.parseNumberAttr(hc.util.getProperty(baseItem.attributes, 'criticalModifier'));
+                    item.criticalMultiplier = hc.util.parseNumberAttr(hc.util.getProperty(baseItem.attributes, 'criticalMultiplier'));
                 }
                 return item;
             },

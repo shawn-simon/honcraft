@@ -2,9 +2,9 @@
     var hc = honcraft;
     common.debug.setConsole($('#main'));
     var hero = honcraft.hero.getHeroById(169);
-    //hero.items.push(honcraft.item.getItemById(2));
+    hero.items.push(honcraft.item.getItemByName('Item_Critical1'));
     //    common.debug.println(hero);
-    //    common.debug.println(honcraft.getDps(hero));
+    common.debug.println(honcraft.getDps(hero));
     //    common.debug.println(honcraft.getArmorDamageMultiplier(2.96));
     //    common.debug.println(honcraft.getArmorDamageMultiplier(0));
     //    common.debug.println(honcraft.getArmorDamageMultiplier(-20));

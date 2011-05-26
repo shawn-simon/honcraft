@@ -2,7 +2,7 @@ if (typeof honcraft === 'undefined') honcraft = {};
 $.extend(honcraft, (function () {
     var hc = {};	
     hc.hero = {
-        create: function (baseHero) {			
+	    create: function (baseHero) {			
             var hero = {
                 name: '',                
 				maxHealth: 0,
@@ -214,7 +214,8 @@ $.extend(honcraft, (function () {
 				damage: 0,
 				criticalChance: 0,
 				criticalMultiplier: 0,
-				totalCost: 0
+				totalCost: 0,
+				events: []
 
 			};
 			if (baseItem != null)
@@ -229,6 +230,7 @@ $.extend(honcraft, (function () {
 				item.criticalMultiplier = hc.util.parseNumberAttr(hc.util.getProperty(baseItem.attributes, 'criticalMultiplier'));
 				item.totalCost = hc.util.parseNumberAttr(hc.util.getProperty(baseItem.attributes, 'totalCost'));
 			}
+			item.events = hc.event.getBySource(item.name);
 			return item;
 		},
 		getAll: function() {
@@ -316,12 +318,12 @@ $.extend(honcraft, (function () {
 		},
 	};
     hc.util = {
-		parseNumberAttr: function(string) {
+		parseNumberAttr: function(input) {
 			// Parses S2 item format when a skill has multiple levels / increased by recipe. Ex: Parsing Damage="10,20,30" returns 30.			
-			if (typeof string === 'number') return string;
-			if (typeof string === 'undefined') return 0;			
-			if (string == null) return 0;
-			var split = string.split(',');
+			if (typeof input === 'number') return input;
+			if (typeof input === 'undefined') return 0;			
+			if (input == null) return 0;
+			var split = input.split(',');
 			return parseFloat(split[split.length - 1]);
 		},
 		getProperty: function(object, name)	{
@@ -368,6 +370,54 @@ $.extend(honcraft, (function () {
 				 result.push(hc.item.getByName(item));
 			});
 			return result;
+		}
+	};
+	hc.event = {
+		create: function() {
+			return 	{
+				ID: '',
+				source: ''				
+			};
+		},
+		load: function(events) {
+			if (typeof hc.data === 'undefined')
+			{
+				hc.data = {};
+			}
+			if (typeof hc.data.event === 'undefined')
+			{
+				hc.data.event = [];
+			}
+			$.each(events, function(i, event) {
+				if (hc.event.getByID(event.ID) == null) 
+				{
+					hc.data.event.push(event);
+				}
+			});
+		},
+		getBySource: function(source)
+		{
+			var result = [];
+			$.each(hc.data.event, function(i, event) 
+			{
+				if (source === event.source)
+				{
+					result.push(event);
+				}
+			});
+			return result;
+		},
+		getByID: function(id)
+		{
+			var result = null;
+			$.each(hc.data.event, function(i, event)
+			{
+				if (event.ID === id) result = event;
+			});
+			return result;
+		},
+		clearAll: function() {
+			hc.data.event = [];
 		}
 	};
     return hc;

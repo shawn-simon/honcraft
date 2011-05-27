@@ -46,6 +46,34 @@
 	};
 	events.push(e);
 	
+	var e = honcraft.event.create();
+	e.source = 'Item_Insanitarius';
+	e.onEquip = function(args) { 
+		args.applyState = 'State_Insanitarius';
+		args.addAttackSpeed = .1;
+		args.addDamage = 31;
+		args.addStrength = 25;		
+		args.assumption = 'Insanitarius is active.';
+	};
+	events.push(e);
+	
+	var e = honcraft.event.create();
+	e.source = 'Item_Pierce';
+	e.onEquip = function(args) { 
+		args.applyState = 'State_Item3B';
+		args.addTargetArmor = -6;	
+		args.assumption = 'Target is affected by -6 from Shieldbreaker.';
+	};
+	events.push(e);
+	
+	var e = honcraft.event.create();
+	e.source = 'Item_ElderParasite';
+	e.onEquip = function(args) { 
+		args.applyState = 'State_Item3B';
+		args.addAttackSpeed = 1;	
+		args.assumption = 'Elder parasite is active.';
+	};
+	events.push(e);
 	
 	honcraft.event.load(events);
 	

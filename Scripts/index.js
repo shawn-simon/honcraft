@@ -6,8 +6,9 @@
     var hero = honcraft.hero.getByName('Hero_Aluna');
 	hero.setLevel(25);
 	hero.setAttributeBoosts(10);
+	common.debug.println(hero);	
 	hero.items.push(honcraft.item.getByName('Item_Critical1'));	
-	var itemsAvailable = honcraft.item.getByName(['Item_DaemonicBreastplate']);
+	var itemsAvailable = honcraft.item.getByName(['Item_Insanitarius']);
 	var steamboots = honcraft.item.getByName('Item_Steamboots');
 	steamboots.fireEvent('AttributeChanged', {attribute: 'intelligence'});
 	itemsAvailable.push(steamboots);
@@ -21,6 +22,7 @@
 		maxCost: 0
 	});
 	console.log(result);
+
 	common.debug.println(result);
     
 };

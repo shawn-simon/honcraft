@@ -40,15 +40,12 @@ $.extend(honcraft, (function () {
 			return aps;
 		},
 		getArmorMultiplier: function (armor) {
-			if (armor < 0) console.log(armor);
 			var multiplier = 1;
 			if (armor > 0) {
 				multiplier = 1 - ((.06 * armor) / (1 + (.06 * armor)));
 			}
 			if (armor < 0) {
 				multiplier = Math.min(2, Math.pow(.94, armor));
-				console.log(multiplier);
-
 			}
 			return multiplier;
 		},

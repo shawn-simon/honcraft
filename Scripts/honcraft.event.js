@@ -68,6 +68,30 @@ $.extend(honcraft, (function () {
 				return eventResult[property];
 			}
 			return eventResult;
+		},
+		applyToDpsResult: function(resultArray, dpsResult) 
+		{
+			$.each(resultArray, function(j, eventResult) 
+			{
+				var state = eventResult.getString('applyState');
+				if (state.length > 0)
+				{
+					if (dpsResult.appliedStates.indexOf(state) == -1)
+					{
+						dpsResult.appliedStates.push(state);
+					}
+					else
+					{
+						return true;
+					}
+				}
+				dpsResult.eventAttackSpeed += eventResult.getNumber('addAttackSpeed');
+				dpsResult.targetArmorModifier += eventResult.getNumber('addTargetArmor');
+				dpsResult.assumptions.push(eventResult.getString('assumption'));
+				dpsResult.rawPhysicalDps += dpsResult.attacksPerSecond * eventResult.getNumber('addPhysicalDamage');	
+				dpsResult.eventStrength += eventResult.getNumber('addStrength');
+				dpsResult.eventDamage += eventResult.getNumber('addDamage');
+			});
 		}
 	};
     return hc;

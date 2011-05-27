@@ -62,7 +62,7 @@ $.extend(honcraft, (function () {
 			hero.setAttributeBoosts = function(attributeBoosts) {
 				hero.attributeBoosts = attributeBoosts;
 			};
-            hero.calculateAttribute = function (attrName) {
+            hero.calculateAttribute = function (attrName, bonusAttributes) {
 				attrName = attrName.toLowerCase();
                 var attributeFromItems = 0;
                 $.each(hero.items, function (i, item) {
@@ -71,10 +71,14 @@ $.extend(honcraft, (function () {
                 var attributeFromLeveling = hero[attrName + 'PerLevel'] * (hero.level - 1);
                 var attributeBoosts = 2 * hero.attributeBoosts;
                 var baseAttr = hero[attrName];
-                return attributeFromItems + attributeFromLeveling + attributeBoosts + baseAttr;
+				var bonusAttr = 0;
+				if (typeof bonusAttributes !== 'undefined' && typeof bonusAttributes[attrName] !== 'undefined') {
+					bonusAttr = bonusAttributes[attrName];
+				}
+                return attributeFromItems + attributeFromLeveling + attributeBoosts + baseAttr + bonusAttr;
             };
-            hero.getAttacksPerSecond = function () {
-                var iasFromItems = 0;
+            hero.getAttacksPerSecond = function (bonusIas) {
+                var iasFromItems = bonusIas;
                 $.each(hero.items, function (i, item) {
                     iasFromItems = iasFromItems + item.attackSpeed;
                 });
@@ -83,8 +87,8 @@ $.extend(honcraft, (function () {
                 var bat = hero.attackCooldown / 1000;
                 return honcraft.math.getAttacksPerSecond(bat, iasFromAgility + iasFromItems);
             };
-            hero.getBaseDamage = function () {
-                return (hero.attackDamageMin + hero.attackDamageMax / 2) + hero.calculateAttribute(hero.primaryAttribute);
+            hero.getBaseDamage = function (bonusAttributes) {
+                return (hero.attackDamageMin + hero.attackDamageMax / 2) + hero.calculateAttribute(hero.primaryAttribute, bonusAttributes);
             };
             hero.calculateMaxDpsItems = function (opt) {                
 				var itemsAvailable = opt.itemsAvailable || honcraft.item.getDefaultTestItems();
@@ -129,58 +133,34 @@ $.extend(honcraft, (function () {
                 return result;
             };
             hero.getDps = function (incTargets) {
-				var result = {};
-				
+
                 // Prepare array of targets.
                 var targets = [];
-                if (typeof incTargets == 'undefined')
-                {
-                    targets = honcraft.hero.sampleTargets.all();
-                }
-                else if (!$.isArray(incTargets)) 
-                {
-                    targets.push(incTargets);
-                }
-				else 
-				{
-					targets = incTargets;
+                if (typeof incTargets == 'undefined') targets = honcraft.hero.sampleTargets.all();                
+                else if (!$.isArray(incTargets)) targets.push(incTargets);                
+				else targets = incTargets;				
+								
+				var result = {
+					appliedStates: [], // Holds all the states applied in the calculation, so that duplicates will never occur- auras, buffs, debuffs, etc.
+					assumptions: [],
+					attacksPerSecond: 0,
+					baseDamage: 0,
+					targetArmorModifier: 0,
+					eventAttackSpeed: 0,
+					eventDamage: 0,
+					eventStrength: 0
 				}
-				 
-				// Holds all the states applied in the calculation, so that duplicates will never occur- auras, buffs, debuffs, etc.
-				result.appliedStates = [];
-				result.assumptions = [];
-				result.attacksPerSecond = 0;
-				result.baseDamage = 0;
-				result.targetArmorBuff = 0;
-				// Fire equip event.
-				var eventResults = hero.fireEvent('Equip');
-				$.each(eventResults, function(j, eventResult) 
-				{
-					var state = eventResult.getString('applyState');
-					if (state.length > 0)
-					{
-						if (result.appliedStates.indexOf(state) == -1)
-						{
-							result.appliedStates.push(state);
-						}
-						else
-						{
-							return true;
-						}
-					}
-					result.attacksPerSecond += eventResult.getNumber('addAttackSpeed');
-					result.targetArmorBuff += eventResult.getNumber('addTargetArmor');
-					result.assumptions.push(eventResult.getString('assumption'));
-				});
 				
+				// Fire equip event.				
+				honcraft.eventResult.applyToDpsResult(hero.fireEvent('Equip'), result);
+								
                 // Calculate base damage;
-                result.baseDamage += hero.getBaseDamage();
-                result.attacksPerSecond += hero.getAttacksPerSecond();
+                result.baseDamage += hero.getBaseDamage({strength: result.eventStrength});
+                result.attacksPerSecond = hero.getAttacksPerSecond(result.eventAttackSpeed);
                 
                 // Get +dmg and crit modifiers from items.
                 result.damageFromItems = 0;            
-                var critModifiers = [];
-                
+                var critModifiers = [];                
                 $.each(hero.items, function(i, item) {
                     result.damageFromItems += item.damage;
                     if (item.criticalChance != null)
@@ -202,17 +182,13 @@ $.extend(honcraft, (function () {
                 result.criticalHitDpsMultiplier = critMultiplierResult.dpsMultiplier;
                 
                 // Get average damage per hit, including critical strike damage. 
-                result.avgDamagePerHit = (result.baseDamage + result.damageFromItems);
+                result.avgDamagePerHit = (result.baseDamage + result.damageFromItems + result.eventDamage);
                                                  
-                var physicalDps =  result.avgDamagePerHit * result.attacksPerSecond * critMultiplierResult.dpsMultiplier;
-                var magicDps = 0;
+                result.rawPhysicalDps = result.avgDamagePerHit * result.attacksPerSecond * critMultiplierResult.dpsMultiplier;
+                result.rawMagicDps = 0;
 
 				/// Fire attack impact event.
-				var eventResults = hero.fireEvent('AttackImpact');						
-				$.each(eventResults, function(j, eventResult) 
-				{
-					physicalDps += result.attacksPerSecond * eventResult.getNumber('addPhysicalDamage');					
-				});
+				honcraft.eventResult.applyToDpsResult(hero.fireEvent('AttackImpact'), result);
 
                 result.byTarget = [];
                 result.items = hero.items;
@@ -220,21 +196,16 @@ $.extend(honcraft, (function () {
 
                 $.each(targets, function (i, target) {
 					var targetResult = {};
-					if (target.armor = 0)
-					{
-						console.log(result.targetArmorBuff);
-					}
-					targetResult.armorMultiplier = honcraft.math.getArmorMultiplier(target.armor + result.targetArmorBuff);
+					targetResult.armorMultiplier = honcraft.math.getArmorMultiplier(target.armor + result.targetArmorModifier);
 					targetResult.magicArmorMultiplier = honcraft.math.getArmorMultiplier(target.magicArmor);
-					targetResult.dps = (physicalDps * targetResult.armorMultiplier ) + (magicDps * targetResult.magicArmorMultiplier);
+					targetResult.dps = (result.rawPhysicalDps * targetResult.armorMultiplier ) + (result.rawMagicDps * targetResult.magicArmorMultiplier);
 					targetResult.name = target.name;
                     result.byTarget.push(targetResult);
                 });
 
                 return result;
             };
-			hero.fireEvent = function(name, args, includeItems)
-			{
+			hero.fireEvent = function(name, args, includeItems) {
 				var results = [];				
 				$.each(hero.events, function(i, e) {
 					if (typeof e['on' + name] === 'function') 					

@@ -148,7 +148,8 @@ $.extend(honcraft, (function () {
 					targetArmorModifier: 0,
 					eventAttackSpeed: 0,
 					eventDamage: 0,
-					eventStrength: 0
+					eventStrength: 0,
+					targetMagicArmorModifier: 0
 				}
 				
 				// Fire equip event.				
@@ -186,7 +187,10 @@ $.extend(honcraft, (function () {
                                                  
                 result.rawPhysicalDps = result.avgDamagePerHit * result.attacksPerSecond * critMultiplierResult.dpsMultiplier;
                 result.rawMagicDps = 0;
-
+				
+				// Fire pre-impack event.				
+				honcraft.eventResult.applyToDpsResult(hero.fireEvent('PreAttackImpact'), result);
+				
 				/// Fire attack impact event.
 				honcraft.eventResult.applyToDpsResult(hero.fireEvent('AttackImpact'), result);
 
@@ -197,7 +201,7 @@ $.extend(honcraft, (function () {
                 $.each(targets, function (i, target) {
 					var targetResult = {};
 					targetResult.armorMultiplier = honcraft.math.getArmorMultiplier(target.armor + result.targetArmorModifier);
-					targetResult.magicArmorMultiplier = honcraft.math.getArmorMultiplier(target.magicArmor);
+					targetResult.magicArmorMultiplier = honcraft.math.getArmorMultiplier(target.magicArmor + result.targetMagicArmorModifier);
 					targetResult.dps = (result.rawPhysicalDps * targetResult.armorMultiplier ) + (result.rawMagicDps * targetResult.magicArmorMultiplier);
 					targetResult.name = target.name;
                     result.byTarget.push(targetResult);
@@ -238,10 +242,11 @@ $.extend(honcraft, (function () {
 	hc.hero.sampleTargets = {
 		pureDamage: hc.hero.create({ name: "Pure Damage", attributes: { ARMOR: 0, MAGICARMOR: 0} }),
 		highArmor: hc.hero.create({ name: "High Armor", attributes: { ARMOR: 30, MAGICARMOR: 5.5} }),
+		twentyArmor: hc.hero.create({ name: "20 Armor", attributes: { ARMOR: 20, MAGICARMOR: 5.5} }),
 		shamansEquipped: hc.hero.create({ name: "Shamans", attributes: { ARMOR: 10, MAGICARMOR: 15.5} }),
 		midGame: hc.hero.create({ name: "Mid Game", attributes: { ARMOR: 9, MAGICARMOR: 5.5} }),
 		all : function() {
-			return [honcraft.hero.sampleTargets.pureDamage, honcraft.hero.sampleTargets.highArmor, honcraft.hero.sampleTargets.shamansEquipped, honcraft.hero.sampleTargets.midGame];
+			return [honcraft.hero.sampleTargets.pureDamage, honcraft.hero.sampleTargets.twentyArmor, honcraft.hero.sampleTargets.highArmor, honcraft.hero.sampleTargets.shamansEquipped, honcraft.hero.sampleTargets.midGame];
 		}
 	}   	
     return hc;

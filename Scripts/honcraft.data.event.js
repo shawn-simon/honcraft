@@ -75,6 +75,16 @@
 	};
 	events.push(e);
 	
+	var e = honcraft.event.create();
+	e.source = 'Item_HarkonsBlade';
+	e.onPreAttackImpact = function(args) { 
+		args.applyState = 'State_HarkonsBlade';
+		args.addTargetMagicArmor = -5;	
+		args.convertToMagicDamage = true;
+		args.assumption = 'Harkon\'s blade is active.';
+	};
+	events.push(e);
+	
 	honcraft.event.load(events);
 	
 })();

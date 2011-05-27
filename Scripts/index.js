@@ -3,12 +3,13 @@
     var hc = honcraft;
     common.debug.setConsole($('#main'));
 	
-    var hero = honcraft.hero.getByName('Hero_Aluna');
+    var hero = honcraft.hero.getByName('Hero_Nomad');
+
 	hero.setLevel(25);
 	hero.setAttributeBoosts(10);
 	common.debug.println(hero);	
 	hero.items.push(honcraft.item.getByName('Item_Critical1'));	
-	var itemsAvailable = honcraft.item.getByName(['Item_Insanitarius']);
+	var itemsAvailable = honcraft.item.getByName(['Item_HarkonsBlade']);
 	var steamboots = honcraft.item.getByName('Item_Steamboots');
 	steamboots.fireEvent('AttributeChanged', {attribute: 'intelligence'});
 	itemsAvailable.push(steamboots);
@@ -19,7 +20,7 @@
 	steamboots.fireEvent('AttributeChanged', {attribute: 'agility'});
 	itemsAvailable.push(steamboots);
 	var result = hero.calculateMaxDpsItems({
-		maxCost: 0
+		maxCost: 0,
 	});
 	console.log(result);
 

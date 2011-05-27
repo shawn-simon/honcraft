@@ -67,6 +67,15 @@ $.extend(honcraft, (function () {
 				}
 				return eventResult[property];
 			}
+			eventResult.getBoolean = function(property, defaultValue)
+			{
+				if (defaultValue == null) defaultValue = '';
+				if (typeof eventResult[property] !== 'boolean')
+				{
+					return defaultValue;
+				}
+				return eventResult[property];
+			}
 			return eventResult;
 		},
 		applyToDpsResult: function(resultArray, dpsResult) 
@@ -91,6 +100,13 @@ $.extend(honcraft, (function () {
 				dpsResult.rawPhysicalDps += dpsResult.attacksPerSecond * eventResult.getNumber('addPhysicalDamage');	
 				dpsResult.eventStrength += eventResult.getNumber('addStrength');
 				dpsResult.eventDamage += eventResult.getNumber('addDamage');
+				dpsResult.targetMagicArmorModifier += eventResult.getNumber('addTargetMagicArmor');
+				if (eventResult.getBoolean('convertToMagicDamage', false))
+				{
+					dpsResult.rawMagicDps = dpsResult.rawPhysicalDps;
+					dpsResult.rawPhysicalDps = 0;
+				}
+								
 			});
 		}
 	};

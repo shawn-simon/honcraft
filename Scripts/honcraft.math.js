@@ -46,7 +46,7 @@ $.extend(honcraft, (function () {
 				multiplier = 1 - ((.06 * armor) / (1 + (.06 * armor)));
 			}
 			if (armor < 0) {
-				multiplier = Math.min(1, Math.pow(.94, armor));
+				multiplier = Math.min(2, Math.pow(.94, armor));
 				console.log(multiplier);
 
 			}

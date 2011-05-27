@@ -7,7 +7,7 @@
 	hero.setLevel(25);
 	hero.setAttributeBoosts(10);
 	hero.items.push(honcraft.item.getByName('Item_Critical1'));	
-	var itemsAvailable = honcraft.item.getByName(['Item_EnhancedMarchers', 'Item_Weapon3']);
+	var itemsAvailable = honcraft.item.getByName(['Item_DaemonicBreastplate']);
 	var steamboots = honcraft.item.getByName('Item_Steamboots');
 	steamboots.fireEvent('AttributeChanged', {attribute: 'intelligence'});
 	itemsAvailable.push(steamboots);

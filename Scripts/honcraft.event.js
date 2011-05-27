@@ -18,10 +18,7 @@ $.extend(honcraft, (function () {
 				hc.data.event = [];
 			}
 			$.each(events, function(i, event) {
-				if (hc.event.getByID(event.ID) == null) 
-				{
-					hc.data.event.push(event);
-				}
+				hc.data.event.push(event);
 			});
 		},
 		getBySource: function(source)

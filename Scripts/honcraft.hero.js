@@ -119,9 +119,9 @@ $.extend(honcraft, (function () {
 					$.each(targets, function(index, target)
 					{
 						if (dpsResult.byTarget[index].dps > result[index].dps) {
-						result[index].dps = dpsResult.byTarget[index].dps;
+						result[index] = $.extend($.extend({}, dpsResult), dpsResult.byTarget[index]);
 						result[index].items = hero.items.slice(0);
-						result[index].dpsResult = dpsResult;
+						delete result[index].byTarget;
 					}
 					});
 				});                        
@@ -145,7 +145,6 @@ $.extend(honcraft, (function () {
 				{
 					targets = incTargets;
 				}
-				
 				 
 				// Holds all the states applied in the calculation, so that duplicates will never occur- auras, buffs, debuffs, etc.
 				result.appliedStates = [];
@@ -217,12 +216,19 @@ $.extend(honcraft, (function () {
 
                 result.byTarget = [];
                 result.items = hero.items;
+				
 
                 $.each(targets, function (i, target) {
-                    result.byTarget.push({
-                        dps: (physicalDps * honcraft.math.getArmorMultiplier(target.armor + result.targetArmorBuff)) + (magicDps * honcraft.math.getArmorMultiplier(target.magicArmor)),
-                        target: target.name
-                    })
+					var targetResult = {};
+					if (target.armor = 0)
+					{
+						console.log(result.targetArmorBuff);
+					}
+					targetResult.armorMultiplier = honcraft.math.getArmorMultiplier(target.armor + result.targetArmorBuff);
+					targetResult.magicArmorMultiplier = honcraft.math.getArmorMultiplier(target.magicArmor);
+					targetResult.dps = (physicalDps * targetResult.armorMultiplier ) + (magicDps * targetResult.magicArmorMultiplier);
+					targetResult.name = target.name;
+                    result.byTarget.push(targetResult);
                 });
 
                 return result;
@@ -241,7 +247,7 @@ $.extend(honcraft, (function () {
 				if (typeof includeItems == 'undefined' || includeItems == null || includeItems !== false)
 				{
 					$.each(hero.items, function(i, item) {
-						$.merge(results, item.fireEvent(name, honcraft.eventResult.create(args)));
+						$.merge(results, item.fireEvent(name, args));
 					});
 				}
 				return results;			

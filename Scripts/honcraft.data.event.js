@@ -85,6 +85,15 @@
 	};
 	events.push(e);
 	
+	var e = honcraft.event.create();
+	e.source = 'Item_Silence';
+	e.onEquip = function(args) { 
+		args.applyState = 'State_Hellflower';
+		args.damageAmplification = .2;	
+		args.assumption = 'Target is affected by Hellflower (20% damage increase).';
+	};
+	events.push(e);
+	
 	honcraft.event.load(events);
 	
 })();

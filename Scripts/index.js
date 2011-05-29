@@ -27,11 +27,11 @@
 		maxCost: 0,
         conditions: [
                      [intBoots, ghostMarchers, strBoots, agiBoots],
-                     [nullstone],
-                     [nullstone],
-                     [nullstone],
-                     [nullstone],
-                     [nullstone],
+                     [],
+                     [],
+                     [],
+                     [],
+                     [],
                      ]
 	});
        

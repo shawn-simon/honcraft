@@ -100,6 +100,7 @@ $.extend(honcraft, (function () {
 				dpsResult.rawPhysicalDps += dpsResult.attacksPerSecond * eventResult.getNumber('addPhysicalDamage');	
 				dpsResult.eventStrength += eventResult.getNumber('addStrength');
 				dpsResult.eventDamage += eventResult.getNumber('addDamage');
+                dpsResult.damageAmplification += eventResult.getNumber('damageAmplification');
 				dpsResult.targetMagicArmorModifier += eventResult.getNumber('addTargetMagicArmor');
 				if (eventResult.getBoolean('convertToMagicDamage', false))
 				{

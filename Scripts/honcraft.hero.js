@@ -175,8 +175,9 @@ $.extend(honcraft, (function () {
 					targetArmorModifier: 0,
 					eventAttackSpeed: 0,
 					eventDamage: 0,
-					eventStrength: 0,
-					targetMagicArmorModifier: 0
+					eventStrength: 0,					
+                    targetMagicArmorModifier: 0,
+                    damageAmplification: 1
 				}
 				
 				// Fire equip event.				
@@ -228,9 +229,9 @@ $.extend(honcraft, (function () {
                 $.each(targets, function (i, target) {
 					var targetResult = {};
 					targetResult.armorMultiplier = honcraft.math.getArmorMultiplier(target.armor + result.targetArmorModifier);
-					targetResult.magicArmorMultiplier = honcraft.math.getArmorMultiplier(target.magicArmor + result.targetMagicArmorModifier);
-					targetResult.dps = (result.rawPhysicalDps * targetResult.armorMultiplier ) + (result.rawMagicDps * targetResult.magicArmorMultiplier);
-					targetResult.name = target.name;
+					targetResult.magicArmorMultiplier = honcraft.math.getArmorMultiplier(Math.max(target.magicArmor + result.targetMagicArmorModifier, 0));
+                    targetResult.dps = result.damageAmplification * ((result.rawPhysicalDps * targetResult.armorMultiplier ) + (result.rawMagicDps * targetResult.magicArmorMultiplier));
+                    targetResult.name = target.name;
                     result.byTarget.push(targetResult);
                 });
 

@@ -90,11 +90,12 @@ $.extend(honcraft, (function () {
             hero.getBaseDamage = function (bonusAttributes) {
                 return (hero.attackDamageMin + hero.attackDamageMax / 2) + hero.calculateAttribute(hero.primaryAttribute, bonusAttributes);
             };
-            hero.calculateMaxDpsItems = function (opt) {                
+            hero.calculateMaxDpsItems = function (opt) {           
+				
+				// Get available item pool.
 				var itemsAvailable = opt.itemsAvailable || honcraft.item.getDefaultTestItems();
                 
-				
-				// Check if max cost search is enabled.
+                // Check if max cost search is enabled.
 				var maxCost = opt.maxCost || 0;
 				if (maxCost > 0)
 				{
@@ -103,33 +104,59 @@ $.extend(honcraft, (function () {
 					emptySlot.name = 'Item_EmptySlot';
 					itemsAvailable.push(emptySlot);
 				}
+                
+				// Prepare item slots / conditions.
+				var conditions = opt.conditions || [[],[],[],[],[],[]];			                
+				// Make each item-slot an array if it is a object.
+				$.each(conditions, function(i, item) {
+					if (!$.isArray(item))
+					{
+						conditions[i] = [item];
+					}
+				});                
+                // Sort by array length
+				conditions.sort(function(a, b) { return a.length < b.length });				                
+                // Differentiate between conditions that search for items, and those that are selected item choices.
+                var firstEmptyCondition = conditions.length;
+                $.each(conditions, function(s, slot) {                          
+                     if (slot.length === 0)
+                     {
+                        firstEmptyCondition = s;
+                        return false
+                     }
+                 });                 
+                var definedConditions = conditions.slice(0, firstEmptyCondition);
+                var searchCount = conditions.slice(firstEmptyCondition).length;
 
 				// Prepare result set.
 				var result = [];                 
 				var targets = opt.targets || honcraft.hero.sampleTargets.all();
-                $.each(targets, function(i, target)
-                {
+                $.each(targets, function(i, target) {
                     result.push({target: target, dps: 0});   
 				});
-
-				// Loop through all item combinations.
-                honcraft.math.getAllCombinations(itemsAvailable.length, 6, function (a, b, c, d, e, f) {				
-					hero.items = [itemsAvailable[a], itemsAvailable[b], itemsAvailable[c], itemsAvailable[d], itemsAvailable[e], itemsAvailable[f]];                    
-					
-					if (maxCost > 0 && honcraft.item.getTotalCost(hero.items) > maxCost) return true; // Item combo costs too much.
-					
-					var dpsResult = hero.getDps(targets);
-
-					$.each(targets, function(index, target)
-					{
-						if (dpsResult.byTarget[index].dps > result[index].dps) {
-						result[index] = $.extend($.extend({}, dpsResult), dpsResult.byTarget[index]);
-						result[index].items = hero.items.slice(0);
-						delete result[index].byTarget;
-					}
-					});
-				});                        
-				
+                
+                honcraft.math.iterateArrayOfArrays(definedConditions, function(testItems) {                                                     
+                    // Loop through all item combinations.
+                     honcraft.math.getAllCombinations(itemsAvailable.length, searchCount, function (args) {                        
+                        hero.items = testItems.slice(0);                    
+                        $.each(args, function(i, arg) {
+                            hero.items.push(itemsAvailable[arg]);
+                        });                        
+                        if (maxCost > 0 && honcraft.item.getTotalCost(hero.items) > maxCost) return true; // Item combo costs too much.         
+                        
+                        var dpsResult = hero.getDps(targets);
+                        
+                        $.each(targets, function(index, target) {
+                            if (dpsResult.byTarget[index].dps > result[index].dps) {
+                                result[index] = $.extend($.extend({}, dpsResult), dpsResult.byTarget[index]);
+                                result[index].items = hero.items.slice(0);
+                                delete result[index].byTarget;
+                            }
+                        });
+                        
+					});           
+                });
+                			         				
                 return result;
             };
             hero.getDps = function (incTargets) {
@@ -149,8 +176,7 @@ $.extend(honcraft, (function () {
 					eventAttackSpeed: 0,
 					eventDamage: 0,
 					eventStrength: 0,
-					targetMagicArmorModifier: 0,
-					damageAmplification: 1
+					targetMagicArmorModifier: 0
 				}
 				
 				// Fire equip event.				
@@ -192,7 +218,7 @@ $.extend(honcraft, (function () {
 				// Fire pre-impack event.				
 				honcraft.eventResult.applyToDpsResult(hero.fireEvent('PreAttackImpact'), result);
 				
-				/// Fire attack impact event.
+				// Fire attack impact event.
 				honcraft.eventResult.applyToDpsResult(hero.fireEvent('AttackImpact'), result);
 
                 result.byTarget = [];
@@ -202,8 +228,8 @@ $.extend(honcraft, (function () {
                 $.each(targets, function (i, target) {
 					var targetResult = {};
 					targetResult.armorMultiplier = honcraft.math.getArmorMultiplier(target.armor + result.targetArmorModifier);
-					targetResult.magicArmorMultiplier = honcraft.math.getArmorMultiplier(Math.max(target.magicArmor + result.targetMagicArmorModifier, 0));
-					targetResult.dps = result.damageAmplification * ((result.rawPhysicalDps * targetResult.armorMultiplier ) + (result.rawMagicDps * targetResult.magicArmorMultiplier));
+					targetResult.magicArmorMultiplier = honcraft.math.getArmorMultiplier(target.magicArmor + result.targetMagicArmorModifier);
+					targetResult.dps = (result.rawPhysicalDps * targetResult.armorMultiplier ) + (result.rawMagicDps * targetResult.magicArmorMultiplier);
 					targetResult.name = target.name;
                     result.byTarget.push(targetResult);
                 });

@@ -6,7 +6,6 @@
 	e.source = 'Item_Steamboots';
 	e.onAttributeChanged = function(args) {				
 		this.strength = this.agility = this.intelligence = 0;
-		console.log(args);
 		if (args.attribute == 'strength')
 		{
 			this.strength = 10;
@@ -82,15 +81,6 @@
 		args.addTargetMagicArmor = -5;	
 		args.convertToMagicDamage = true;
 		args.assumption = 'Harkon\'s blade is active.';
-	};
-	events.push(e);
-	
-	var e = honcraft.event.create();
-	e.source = 'Item_Silence';
-	e.onEquip = function(args) { 
-		args.applyState = 'State_Hellflower';
-		args.damageAmplification = .2;	
-		args.assumption = 'Target is affected by Hellflower (20% damage increase).';
 	};
 	events.push(e);
 	

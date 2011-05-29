@@ -8,17 +8,43 @@ $.extend(honcraft, (function () {
 				for (var i = args[len - 1]; i < n; i++) {
 					args.splice(len);
 					args[len - 1] = i;
-					if (remaining) {
+					if (remaining > 0) {
 						args[len] = i;
 						iterate(remaining - 1, args);
 					}
 					else {
-						callback.apply(null, args);
+						callback.call(null, args);
 					}
 				}
 			}
-			iterate(k - 1, [0]);
+            if (k == 0) 
+            {                
+                callback.call(null, []);
+            }
+            else
+            {
+                iterate(k - 1, [0]);
+            }
 		},
+        iterateArrayOfArrays: function(arrayOfArrays, callback)
+        {   
+			var iterate = function (position, args) {                
+                for (var i = 0; i < arrayOfArrays[position].length; i++)
+                {
+                    args[position] = arrayOfArrays[position][i];                    
+                    if (position == arrayOfArrays.length - 1)
+                    {
+                        callback.call(null, args);
+                    }
+                    else
+                    {
+                        iterate(position + 1, args);
+                    }
+                    
+                }                	
+			}
+			iterate(0, []);
+        },
 		getCritMultiplier: function(critMultipliers) {            
 			critMultipliers.sort(function(a, b) {return b.criticalMultiplier - a.criticalMultiplier});
 			var dpsMultiplier = 1;                   

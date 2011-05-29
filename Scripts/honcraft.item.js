@@ -81,8 +81,6 @@ $.extend(honcraft, (function () {
 		},
 		getDefaultTestItems: function()	{
 			 var items = [
-				'Item_EnhancedMarchers',
-				'Item_Steamboots',
 				'Item_DaemonicBreastplate',
 				'Item_Critical1',
 				'Item_Insanitarius',

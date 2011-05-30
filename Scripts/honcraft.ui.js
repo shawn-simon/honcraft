@@ -152,7 +152,6 @@ honcraft.ui.getResults = function()
         conditions: honcraft.ui.conditions,
 		itemsAvailable: honcraft.ui.itemsAvailable
 	});
-	console.log(results);
 	var $results = $('#results-area').html('');
 	$.each(results, function(i, res)
 	{

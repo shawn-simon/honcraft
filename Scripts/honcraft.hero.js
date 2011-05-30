@@ -130,7 +130,7 @@ $.extend(honcraft, (function () {
 
 				// Prepare result set.
 				var result = [];                 
-				var targets = opt.targets || honcraft.hero.sampleTargets.all();
+				var targets = opt.targets || honcraft.hero.getSampleTargets();
                 $.each(targets, function(i, target) {
                     result.push({target: target, dps: 0});   
 				});
@@ -163,7 +163,7 @@ $.extend(honcraft, (function () {
 
                 // Prepare array of targets.
                 var targets = [];
-                if (typeof incTargets == 'undefined') targets = honcraft.hero.sampleTargets.all();                
+                if (typeof incTargets == 'undefined') targets = honcraft.hero.getSampleTargets();                
                 else if (!$.isArray(incTargets)) targets.push(incTargets);                
 				else targets = incTargets;				
 								
@@ -237,6 +237,7 @@ $.extend(honcraft, (function () {
 
                 return result;
             };
+            
 			hero.fireEvent = function(name, args, includeItems) {
 				var results = [];				
 				$.each(hero.events, function(i, e) {
@@ -255,6 +256,8 @@ $.extend(honcraft, (function () {
 				}
 				return results;			
 			}
+            hero.events = honcraft.event.getBySource(hero.name); // note: event is null?
+            hero.fireEvent('Created', {hero: hero});
             return hero;
         },
 		getByName: function (name) {			
@@ -267,15 +270,14 @@ $.extend(honcraft, (function () {
 			return honcraft.hero.create(result);
         }    
 	}; 
-	hc.hero.sampleTargets = {
-		pureDamage: hc.hero.create({ name: "Pure Damage", attributes: { ARMOR: 0, MAGICARMOR: 0} }),
-		highArmor: hc.hero.create({ name: "High Armor", attributes: { ARMOR: 30, MAGICARMOR: 5.5} }),
-		twentyArmor: hc.hero.create({ name: "20 Armor", attributes: { ARMOR: 20, MAGICARMOR: 5.5} }),
-		shamansEquipped: hc.hero.create({ name: "Shamans", attributes: { ARMOR: 10, MAGICARMOR: 15.5} }),
-		midGame: hc.hero.create({ name: "Mid Game", attributes: { ARMOR: 9, MAGICARMOR: 5.5} }),
-		all : function() {
-			return [honcraft.hero.sampleTargets.pureDamage, honcraft.hero.sampleTargets.twentyArmor, honcraft.hero.sampleTargets.highArmor, honcraft.hero.sampleTargets.shamansEquipped, honcraft.hero.sampleTargets.midGame];
-		}
+	hc.hero.getSampleTargets = function() {
+        return [
+            hc.hero.create({ name: "Pure Damage", attributes: { ARMOR: 0, MAGICARMOR: 0} }),
+            hc.hero.create({ name: "High Armor", attributes: { ARMOR: 30, MAGICARMOR: 5.5} }),
+            hc.hero.create({ name: "20 Armor", attributes: { ARMOR: 20, MAGICARMOR: 5.5} }),
+            hc.hero.create({ name: "Shamans", attributes: { ARMOR: 10, MAGICARMOR: 15.5} }),
+            hc.hero.create({ name: "Mid Game", attributes: { ARMOR: 9, MAGICARMOR: 5.5} }),
+        ]	
 	}   	
     return hc;
 })());

@@ -43,7 +43,14 @@ $.extend(honcraft, (function () {
                     
                 }                	
 			}
-			iterate(0, []);
+            if (arrayOfArrays.length == 0)
+            {
+                callback.call(null, []);
+            }
+            else
+            {
+                iterate(0, []);
+            }
         },
 		getCritMultiplier: function(critMultipliers) {            
 			critMultipliers.sort(function(a, b) {return b.criticalMultiplier - a.criticalMultiplier});

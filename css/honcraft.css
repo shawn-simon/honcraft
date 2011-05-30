@@ -1,0 +1,37 @@
+body 
+{
+    font-family: Tahoma;
+    font-size:12px;
+}
+
+h1, h2
+{
+    font-size: 14px;
+}
+
+input.number
+{
+	width:50px;
+}
+
+#hero label
+{
+	width:100px;
+	display:inline-block;
+}
+
+ul, li 
+{
+    font-size:12px;
+}
+#hero 
+{
+    display:inline-block;
+    width:300px;
+    border: 1px solid #000;
+    padding:10px;
+}
+#conditions
+{
+	display:inline-block;	
+}

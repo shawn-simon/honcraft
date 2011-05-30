@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>HoN DPS Calculator</title>
+    <link type="text/css" rel="stylesheet" href="css/honcraft.css" />
+</head>
+<body> 
+    <h1>HoNCraft DPS Calculator</h1>
+	<div>
+		<div id="hero">
+			<label for="hero-select">Hero:</label><select id="hero-select" onchange="honcraft.ui.heroChanged()"></select><br />
+			<label for="hero-level">Level:</label><input class='number' id='hero-level' type='text' value='25' onkeyup="honcraft.ui.heroChanged()"></input><br />
+			<label for="hero-boosts">Attribute Boosts: </label><input class='number' id='hero-boosts' type='text' value='10' onkeyup="honcraft.ui.heroChanged()"></input><br />
+			<div id="hero-details"></div>
+		</div> 
+		<div id='conditions'>
+			<h2>Max Dps Search</h2>
+			<p></p>
+			<div class='cond' id='cond1'></div>
+			<div class='cond' id='cond2'></div>
+			<div class='cond' id='cond3'></div>
+			<div class='cond' id='cond4'></div>
+			<div class='cond' id='cond5'></div>
+			<div class='cond' id='cond6'></div>		
+		</div>
+		<div id='results'>
+		
+		</div>
+	</div>
+    <script src="Scripts/jquery-1.4.1.js" type="text/javascript"></script>
+	<script src="Scripts/honcraft.util.js" type="text/javascript"></script>
+	<script src="Scripts/honcraft.hero.js" type="text/javascript"></script>
+    <script src="Scripts/honcraft.data.hero.js" type="text/javascript"></script>
+    <script src="Scripts/honcraft.event.js" type="text/javascript"></script>
+	<script src="Scripts/honcraft.data.event.js" type="text/javascript"></script>
+    <script src="Scripts/honcraft.item.js" type="text/javascript"></script>
+	<script src="Scripts/honcraft.data.item.js" type="text/javascript"></script>
+    <script src="Scripts/honcraft.math.js" type="text/javascript"></script>
+    <script src="Scripts/honcraft.ui.js" type="text/javascript"></script>
+    <script>
+		$(honcraft.ui.ready);
+	</script>
+</body>
+</html>

@@ -28,7 +28,7 @@ $.extend(honcraft, (function () {
                 items: [],
                 level: 1,
                 attributeBoosts: 0,
-				assumptions: [],
+				assumption: '',
 				events: []
 
             };
@@ -224,7 +224,10 @@ $.extend(honcraft, (function () {
 
                 result.byTarget = [];
                 result.items = hero.items;
-				
+				if (hero.assumption.length > 0) 
+				{
+					result.assumptions.push(hero.assumption);
+				}
 
                 $.each(targets, function (i, target) {
 					var targetResult = {};
@@ -232,6 +235,8 @@ $.extend(honcraft, (function () {
 					targetResult.magicArmorMultiplier = honcraft.math.getArmorMultiplier(Math.max(target.magicArmor + result.targetMagicArmorModifier, 0));
                     targetResult.dps = result.damageAmplification * ((result.rawPhysicalDps * targetResult.armorMultiplier ) + (result.rawMagicDps * targetResult.magicArmorMultiplier));
                     targetResult.name = target.name;
+					targetResult.targetArmor = target.armor;
+					targetResult.targetMagicArmor = target.magicArmor;
                     result.byTarget.push(targetResult);
                 });
 

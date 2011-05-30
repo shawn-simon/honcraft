@@ -96,7 +96,11 @@ $.extend(honcraft, (function () {
 				}
 				dpsResult.eventAttackSpeed += eventResult.getNumber('addAttackSpeed');
 				dpsResult.targetArmorModifier += eventResult.getNumber('addTargetArmor');
-				dpsResult.assumptions.push(eventResult.getString('assumption'));
+				var assumption = eventResult.getString('assumption');
+				if (assumption.length > 0)
+				{
+					dpsResult.assumptions.push(assumption);
+				}
 				dpsResult.rawPhysicalDps += dpsResult.attacksPerSecond * eventResult.getNumber('addPhysicalDamage');	
 				dpsResult.eventStrength += eventResult.getNumber('addStrength');
 				dpsResult.eventDamage += eventResult.getNumber('addDamage');

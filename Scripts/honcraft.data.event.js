@@ -132,8 +132,9 @@
 	e.onCreated = function(args) { 
         this.critModifier = {
             criticalChance: .5,
-            criticalMultiplier: 25
-        }
+            criticalMultiplier: 2
+        }		
+		this.assumption = 'Scout has level 4 Disarm. Bonus attack speed from vanish is not calculated.';
 	};
 	events.push(e);
     

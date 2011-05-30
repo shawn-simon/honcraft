@@ -5,26 +5,80 @@
     <link type="text/css" rel="stylesheet" href="css/honcraft.css" />
 </head>
 <body> 
-    <h1>HoNCraft DPS Calculator</h1>
-	<div>
+    <h1>HoNCraft - Heroes of Newerth DPS Calculator</h1>
+	<p>Find the maximum possible DPS for a hero using a given set of items and conditions.</p>
+	<div>		
 		<div id="hero">
-			<label for="hero-select">Hero:</label><select id="hero-select" onchange="honcraft.ui.heroChanged()"></select><br />
-			<label for="hero-level">Level:</label><input class='number' id='hero-level' type='text' value='25' onkeyup="honcraft.ui.heroChanged()"></input><br />
-			<label for="hero-boosts">Attribute Boosts: </label><input class='number' id='hero-boosts' type='text' value='10' onkeyup="honcraft.ui.heroChanged()"></input><br />
+			<h2>Hero Selection</h2>
+			<label for="hero-select">Hero:</label><select id="hero-select" onchange="honcraft.ui.refresh()"></select><br />
+			<label for="hero-level">Level:</label><input class='number' id='hero-level' type='text' value='25' onkeyup="honcraft.ui.refresh()"></input><br />
+			<label for="hero-boosts">Attribute Boosts: </label><input class='number' id='hero-boosts' type='text' value='10' onkeyup="honcraft.ui.refresh()"></input><br />
 			<div id="hero-details"></div>
 		</div> 
-		<div id='conditions'>
-			<h2>Max Dps Search</h2>
-			<p></p>
-			<div class='cond' id='cond1'></div>
-			<div class='cond' id='cond2'></div>
-			<div class='cond' id='cond3'></div>
-			<div class='cond' id='cond4'></div>
-			<div class='cond' id='cond5'></div>
-			<div class='cond' id='cond6'></div>		
+		<div id="conditions">
+			<h2>Item Search Conditions</h2>
+			<label for="cond-cost">Max total cost:</label><input class='number' id='cond-cost' type='text' value='0'></input><span> (0 for unlimited)</span>
+			<br />
+			<p>Select the items you require on your hero before maximizing your remaining items for dps. If you select multiple items in a single item slot, the highest DPS item will be displayed in the reuslts.</p>			
+			<div class='item-picker'>
+				<select class='item-select' id='item-select-0'></select> <span class='action' onclick='honcraft.ui.addCondition(0)'>Add Item</span>
+				<br/>
+				<div class='slot' id='cond-0'></div>
+			</div>
+			<div class='item-picker'>
+				<select class='item-select' id='item-select-1'></select> <span class='action' onclick='honcraft.ui.addCondition(1)'>Add Item</span>
+				<br/>
+				<div class='slot' id='cond-1'></div>
+			</div>
+			<div class='item-picker'>
+				<select class='item-select' id='item-select-2'></select> <span class='action' onclick='honcraft.ui.addCondition(2)'>Add Item</span>
+				<br/>
+				<div class='slot' id='cond-2'></div>
+			</div>
+			<div class='item-picker'>
+				<select class='item-select' id='item-select-3'></select> <span class='action' onclick='honcraft.ui.addCondition(3)'>Add Item</span>
+				<br/>
+				<div class='slot' id='cond-3'></div>
+			</div>
+			<div class='item-picker'>
+				<select class='item-select' id='item-select-4'></select> <span class='action' onclick='honcraft.ui.addCondition(4)'>Add Item</span>
+				<br/>
+				<div class='slot' id='cond-4'></div>
+			</div>
+			<div class='item-picker'>
+				<select class='item-select' id='item-select-5'></select> <span class='action' onclick='honcraft.ui.addCondition(5)'>Add Item</span>
+				<br/>
+				<div class='slot' id='cond-5'></div>
+			</div>
+			
+			<p>Pool of items to search from:</p>
+			<div class='item-picker'>
+				<select class='item-select' id='item-pool-select'></select> <span class='action' onclick='honcraft.ui.addItemToPool()'>Add Item</span>
+				<br/>
+				<div class='slot' id='item-pool'></div>
+			</div>
+		
 		</div>
 		<div id='results'>
+			<h2>Results</h2>
+			<strong><span class='action' id='get-results' onclick='honcraft.ui.getResults()'>Get Results</span></strong> <em>Your browser may crash.</em> 
+			<div id='results-area'>
+			</div>
+		</div>
+		<div id='notes'>
+			<h2>Notes / To-do</h2>
+			<p>Not all items / heroes have been coded yet. Items / heroes that have any activated abilities, passives, auras, or modifiers need to be specially coded.</p>		
+			<p>The data is still a few patches behind.</p>		
+			<p>There will eventually be an effective HP / MHP calculator (tank item calc.)</p>
+		</div>
 		
+		<div id='how-top'>
+			<h2>How to use the DPS Calculator</h2>
+			<p>I recommend using Google Chrome for the DPS calculator since it does an extreme number of brute-force calculations. Depending on the number of items you are searching through, getting results could crash your browser.
+		<div>
+		<div id='about'>
+			<h2>About</h2>
+			<p>Please send any feedback (usability issues, questions, feature suggestions, etc.) to <a href='mailto:midorfeed@gmail.com'>midorfeed@gmail.com</a> or contact me in game @ teen. Interested in contributing or learning more? Check out the source at <a href='http://github.com/teen-/honcraft'>http://github.com/teen-/honcraft</a>.</p>
 		</div>
 	</div>
     <script src="Scripts/jquery-1.4.1.js" type="text/javascript"></script>
@@ -39,6 +93,17 @@
     <script src="Scripts/honcraft.ui.js" type="text/javascript"></script>
     <script>
 		$(honcraft.ui.ready);
+	</script>
+	<script type="text/javascript">
+	  var _gaq = _gaq || [];
+	  _gaq.push(['_setAccount', 'UA-23664248-1']);
+	  _gaq.push(['_trackPageview']);
+
+	  (function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  })();
 	</script>
 </body>
 </html>

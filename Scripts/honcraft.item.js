@@ -43,6 +43,10 @@ $.extend(honcraft, (function () {
 				});
 				return results;
 			};
+			item.getName = function() 
+			{
+				return item.displayName || item.name;
+			},
 			item.fireEvent('Created', {item: item});
 			return item;
 		},

@@ -6,33 +6,52 @@
 	e.source = 'Item_Steamboots';
 	e.onAttributeChanged = function(args) {				
 		this.strength = this.agility = this.intelligence = 0;
-		if (args.attribute == 'strength')
+		if (args.attribute == 'Strength')
 		{
 			this.strength = 10;
             this._attr = 'Strength';
 		}
-		if (args.attribute == 'intelligence')
+		if (args.attribute == 'Intelligence')
 		{
 			this.intelligence = 10;
             this._attr = 'Intelligence'
 		}
-		if (args.attribute == 'agility')
+		if (args.attribute == 'Agility')
 		{
 			this.agility = 10;
             this._attr = 'Agility';
 		}
+		this.displayName = 'Steamboots (' + this._attr + ')';
 	};
 	events.push(e);
 	
     var e = honcraft.event.create();
 	e.source = 'Item_Steamboots';
-	e.onEquip = function(args) {			
+	e.onCreated = function(args) {			
         if (this._attr == null)
         {
             this._attr = 'Strength';
         }
-		args.assumptions = 'Steamboots are set to ' + this._attr;
+		this.displayName = 'Steamboots (' + this._attr + ')';
+		var that = this;
+		this.toggle = function() 
+		{
+			switch (that._attr)
+			{
+				case "Strength":
+					that._attr = "Intelligence";
+					break;
+				case "Intelligence":
+					that._attr = "Agility";
+					break;
+				case "Agility":
+					that._attr = "Strength";
+					break;
+			}		
+			that.fireEvent('AttributeChanged', that._attr);
+		}
 	};
+	
 	events.push(e);
     
 	var e = honcraft.event.create();

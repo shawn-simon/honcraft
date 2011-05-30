@@ -14,7 +14,7 @@ input.number
 	width:50px;
 }
 
-#hero label
+#hero label, #conditions label
 {
 	width:100px;
 	display:inline-block;
@@ -30,8 +30,43 @@ ul, li
     width:300px;
     border: 1px solid #000;
     padding:10px;
+	vertical-align: top;
 }
 #conditions
 {
 	display:inline-block;	
+	margin-left:10px;
+	border: 1px solid #000;
+	padding:10px;
+	vertical-align: top;
+}
+
+span.action 
+{
+	border: 1px solid #ffaaaa;
+	border-radius: 3px;
+	padding: 3px;
+	cursor: pointer;
+	background-color: #ffeeee;	
+}
+div.item span.action
+{
+	margin-left:4px;
+}
+div.item 
+{
+	border: 1px solid #aaaaff;
+	background-color: #ddddff;
+	border-radius: 3px;
+	margin-right:5px;
+	line-height:33px;
+	
+	display: inline;
+	padding:6px;
+}
+div.item-picker
+{
+	border: 1px solid black;
+	padding:3px;
+	margin-bottom:3px;
 }

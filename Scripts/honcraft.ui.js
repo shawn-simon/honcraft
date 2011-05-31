@@ -201,9 +201,9 @@ honcraft.ui.getResults = function()
 	});	
 	$('#get-results').html('Refresh Results').attr('disabled', '');
 }
-honcraft.ui.span = function(name, value, class)
+honcraft.ui.span = function(name, value, cssclass)
 {
-	return '<span class="' + class + '">' + name + ': ' + value + '</span>'
+	return '<span class="' + cssclass + '">' + name + ': ' + value + '</span>'
 }
 honcraft.ui.isPrintable = function(prop) 
 {

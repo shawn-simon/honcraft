@@ -21,6 +21,7 @@ $.extend(honcraft, (function () {
 			if (baseItem != null)
 			{                
 				item.name = honcraft.util.getProperty(baseItem, 'name');
+				item.displayName = honcraft.util.getProperty(baseItem, 'displayName');
 				item.strength = honcraft.util.parseNumberAttr(honcraft.util.getProperty(baseItem.attributes, 'strength'));
 				item.agility = honcraft.util.parseNumberAttr(honcraft.util.getProperty(baseItem.attributes, 'agility'));
 				item.intelligence = honcraft.util.parseNumberAttr(honcraft.util.getProperty(baseItem.attributes, 'intelligence'));
@@ -75,7 +76,16 @@ $.extend(honcraft, (function () {
 				}
 			});
 			return honcraft.item.create(result);
-		},             
+		},
+		getAll: function()
+		{
+			var items = [];
+			$.each(honcraft.data.item, function(i, dataitem)
+			{
+				items.push(honcraft.item.create(dataitem));
+			});
+			return items.sort(honcraft.util.getArrayAlphaSort('displayName'));
+		},
 		getTotalCost: function (items) {
 			var totalCost = 0;
 			$.each(items, function(i, item) {

@@ -19,6 +19,16 @@ $.extend(honcraft, (function () {
 			if (typeof prop == 'undefined') 
 				prop = null;
 			return prop;
+		},		
+		getArrayAlphaSort: function(propertyName) {
+			return function(a, b) {
+				var nameA= a[propertyName].toLowerCase(), nameB=b[propertyName].toLowerCase()
+				if (nameA < nameB)
+					return -1 
+				if (nameA > nameB)
+					return 1
+				return 0 
+			}
 		}
 	};
     return hc;

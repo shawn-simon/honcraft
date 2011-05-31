@@ -34,7 +34,8 @@ $.extend(honcraft, (function () {
             };
 			if (baseHero != null)
 			{                
-				hero.name = honcraft.util.getProperty(baseHero, 'name');				
+				hero.name = honcraft.util.getProperty(baseHero, 'name');			
+				hero.displayName = honcraft.util.getProperty(baseHero, 'displayName');					
 				hero.maxHealth = honcraft.util.parseNumberAttr(honcraft.util.getProperty(baseHero.attributes, 'maxHealth'));
 				hero.healthRegen = honcraft.util.parseNumberAttr(honcraft.util.getProperty(baseHero.attributes, 'healthRegen'));
 				hero.maxMana = honcraft.util.parseNumberAttr(honcraft.util.getProperty(baseHero.attributes, 'maxMana'));
@@ -273,7 +274,16 @@ $.extend(honcraft, (function () {
 				}
 			});
 			return honcraft.hero.create(result);
-        }    
+        },
+	    getAll: function()
+		{
+			var heroes = [];
+			$.each(honcraft.data.hero, function(i, datahero)
+			{
+				heroes.push(honcraft.hero.create(datahero));
+			});
+			return heroes.sort(honcraft.util.getArrayAlphaSort('displayName'));
+		}
 	}; 
 	hc.hero.getSampleTargets = function() {
         return [

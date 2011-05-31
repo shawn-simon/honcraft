@@ -6,18 +6,17 @@ if (typeof honcraft.ui === 'undefined') honcraft.ui = {
 honcraft.ui.ready = function() 
 {	
     // Hero selectors
-    var $selector = $('#hero-select');
-    $.each(honcraft.data.hero, function(i, hero)
+    var $selector = $('#hero-select');	
+    $.each(honcraft.hero.getAll(), function(i, hero)
     {
-		var name = honcraft.util.getProperty(hero, 'name');
-        $selector.append('<option ' + (name == 'Hero_Scout' ? 'selected' : '') + '>' + name + '</option>');
+        $selector.append('<option ' + (hero.name == 'Hero_Scout' ? 'selected' : '') + ' value="' + hero.name + '">' + hero.displayName + '</option>');
     });
 	
 	// Item selectors
     var $selector = $('.item-select');
-    $.each(honcraft.data.item, function(i, hero)
+    $.each(honcraft.item.getAll(), function(i, item)
     {
-        $selector.append('<option>' + honcraft.util.getProperty(hero, 'name') + '</option>');
+        $selector.append('<option value="' + item.name + '">' + item.displayName + '</option>');
     });
 	
 	// Default conditions
